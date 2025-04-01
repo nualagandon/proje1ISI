@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from tkinter import ttk
 from datetime import datetime
 
@@ -44,17 +45,6 @@ configuration_pieces = {
     }
 }
 
-def afficher_popup_alerte(message) :
-    """Fonction qui prévient si jamais une information rentrée est pas valide"""
-    alerte = Toplevel(ma_fenetre)
-    alerte.geometry("500x150")
-    alerte.title("Alerte")
-    message_alerte = Label(alerte, text=message, font=("Arial", 14))
-    message_alerte.grid(row=0, column=0)
-    bouton_fermer = Button(alerte, text="Fermer", command=alerte.destroy, font=("Arial", 14))
-    bouton_fermer.grid(row=1, column=0)
-    alerte.transient(ma_fenetre)
-
 def changer_etat_eclairage(event):
     """Fonction qui permet le réglage de la couleur et de l'intensité de l'éclairage si l'éclairage est allumé"""
     if combobox_statut_eclairage.get() == "Allumer":
@@ -89,16 +79,16 @@ def ajouter_piece():
         # Réinitialiser le champ de saisie
         input_nom_piece.set("")
     elif nom_piece in configuration_pieces:
-        afficher_popup_alerte("Cette pièce existe déjà !")
+        messagebox.showerror("Erreur","Cette pièce existe déjà !")
     else:
-        afficher_popup_alerte("Veuillez entrer un nom de pièce valide.")
+        messagebox.showerror("Erreur","Veuillez entrer un nom de pièce valide.")
 
 def supprimer_piece():
     """Fonction qui permet de supprimer une pièce à la liste des pièces"""
     nom_piece = input_nom_piece.get().strip() 
 
     if listebox_pieces.size() <= 1:
-        afficher_popup_alerte("Vous ne pouvez pas supprimer la dernière pièce.")
+        messagebox.showwarning("Alerte", "Vous ne pouvez pas supprimer la dernière pièce.")
         return
     
     try:
@@ -114,7 +104,7 @@ def supprimer_piece():
         listebox_pieces.selection_set(0)
         charger_configuration(None)
     except:
-        afficher_popup_alerte("La pièce que vous essayez de supprimer n'existe pas !")
+        messagebox.showerror("Erreur","La pièce que vous essayez de supprimer n'existe pas !")
         input_nom_piece.set("")
 
 def charger_configuration(event):
@@ -141,7 +131,7 @@ def charger_configuration(event):
         changer_etat_chauffage(None)
 
     else:
-        afficher_popup_alerte("La configuration de cette pièce est introuvable.")
+        messagebox.showerror("Erreur","La configuration de cette pièce est introuvable.")
 
 def sauvegarder_configuration():
     if piece_actuelle and piece_actuelle in configuration_pieces:
@@ -162,9 +152,9 @@ def sauvegarder_configuration():
             'programme': combobox_programme.get()
         }
        
-        afficher_popup_alerte(f"Configuration de la pièce « {piece_actuelle} »\nsauvegardée avec succès.")
+        messagebox.showinfo("Sauvegarde réussie",f"Configuration de la pièce « {piece_actuelle} »\nsauvegardée avec succès.")
     else:
-        afficher_popup_alerte("Aucune pièce sélectionnée.")
+        messagebox.showerror("Erreur","Aucune pièce sélectionnée.")
 
 def changer_etat_chauffage(event) :
     """Fonction pour allumer et éteindre le chauffage."""
@@ -178,14 +168,13 @@ def changer_etat_chauffage(event) :
 
 def verifier_temperature() :
     """Fonction pour modifier le chauffage"""
-    print("température modifiée")
     if int(spinbox_temperature.get()) > 30 :
         valeur_temperature.set(30)
-        afficher_popup_alerte("La température est trop élevée !\nElle ne peut pas dépasser 30°C.")
+        messagebox.showwarning("Alerte","La température est trop élevée ! Elle ne peut pas dépasser 30°C.")
         
     elif int(spinbox_temperature.get()) < 5 : 
         valeur_temperature.set(5)
-        afficher_popup_alerte("La température est trop basse !\nElle ne peut pas être inférieure à 5°C.")
+        messagebox.showwarning("Alerte","La température est trop basse ! Elle ne peut pas être inférieure à 5°C.")
 
 def appliquer_programme_chauffage(event) :
     """#Fonction pour programme économique, hiver, été, programé ou aucun"""
@@ -217,35 +206,46 @@ def appliquer_programme_chauffage(event) :
 
     spinbox_temperature.config(values=valeur_temperature)
 
+
 ma_fenetre = Tk()
 ma_fenetre.title("Système de domotique de la maison")
-ma_fenetre.geometry("800x600")
-ma_fenetre.resizable(False,False)
+ma_fenetre.geometry("900x600")
+
+ma_fenetre.grid_rowconfigure(0, weight=1)
+ma_fenetre.grid_columnconfigure(0, weight=2)
+ma_fenetre.grid_columnconfigure(1, weight=5)
 # Création du cadre ou se trouvent tous les paramétrages de l'éclairage
-cadre_pieces = Frame(ma_fenetre)
-cadre_actions = Frame(ma_fenetre)
+
+cadre_pieces = Frame(ma_fenetre, bg='#222222', width=200)
+cadre_pieces.grid_rowconfigure(0, weight=0)
+cadre_pieces.grid_columnconfigure(0, weight=1)
+
+cadre_actions = Frame(ma_fenetre, bg='#f2f2f2', width=500) 
 cadre_eclairage = Frame(cadre_actions)
 cadre_chauffage = Frame(cadre_actions)
 
-cadre_pieces.grid(row=0,column=0, padx=20, pady=20)
-cadre_actions.grid(row=0,column=1, padx=20, pady=20)
-cadre_eclairage.grid(row=1, column=0, padx=20, pady=20)
-cadre_chauffage.grid(row=2, column=0, padx=20, pady=20)
+cadre_pieces.grid(row=0,column=0,sticky="nsw")
+cadre_actions.grid(row=0,column=1,sticky="nsew")
+cadre_eclairage.grid(row=1, column=0)
+cadre_chauffage.grid(row=2, column=0)
 
 
 # Configuration de la zone de séléction des pièces
 label_nom_piece_selectionnee = StringVar()
 label_nom_piece_selectionnee.set("Aucune pièce sélectionnée")
-label_piece_selectionnee = Label(cadre_actions, textvariable=label_nom_piece_selectionnee, font=('Arial', 20),anchor='w')
+label_piece_selectionnee = Label(cadre_actions, textvariable=label_nom_piece_selectionnee, font=('Arial', 24), fg='#222222', width=30)
 bouton_sauvegarder = Button(cadre_actions, text="Valider", font=('Arial', 14), command=lambda: sauvegarder_configuration())
 
-label_piece_selectionnee.grid(row=0,column=0)
-bouton_sauvegarder.grid(row=3,column=0)
+label_piece_selectionnee.grid(row=0,column=0, pady=(20,10))
+bouton_sauvegarder.grid(row=3,column=0, pady=(20,10))
 
 
-label_pieces = Label(cadre_pieces, text="Pièces", font=('Arial',20))
+label_pieces = Label(cadre_pieces, text="Pièces", font=('Arial',20), bg='#222222', fg='#f2f2f2')
 noms_pieces = StringVar()
-listebox_pieces = Listbox(cadre_pieces, listvariable=noms_pieces, font=('Arial',14))
+listebox_pieces = Listbox(cadre_pieces, listvariable=noms_pieces, font=('Arial',18), 
+                          bg='#222222',fg='#f2f2f2', selectbackground='#f2f2f2',selectforeground='#222222',
+                          selectmode=SINGLE, borderwidth=0, activestyle='none', justify='center',
+                          highlightthickness=0)
 noms_pieces.set(list(configuration_pieces.keys()))
 listebox_pieces.config(height=listebox_pieces.size())
 
@@ -256,20 +256,22 @@ listebox_pieces.bind("<<ListboxSelect>>", charger_configuration)
 
 input_nom_piece = StringVar()
 label_ajouter_ou_supprimer = Label(cadre_pieces, text="Saisir le nom de la\npièce que vous souhaitez\najouter ou supprimer", 
-                                   font=('Arial',14))
-saisie_nom_piece = Entry(cadre_pieces, textvariable=input_nom_piece,font=('Arial',14))
+                                   font=('Arial',14), bg='#222222', fg='#f2f2f2')
+saisie_nom_piece = Entry(cadre_pieces, textvariable=input_nom_piece,font=('Arial',14), bg='#f2f2f2')
 bouton_ajouter_piece = Button(cadre_pieces, text="Ajouter",
-                              font=('Arial',14), command=lambda: ajouter_piece())
+                              font=('Arial',14), command=lambda: ajouter_piece(),
+                              bg='#f2f2f2',fg='#222222',width=10)
 
 bouton_supprimer_piece = Button(cadre_pieces, text="Supprimer",
-                              font=('Arial',14), command=lambda: supprimer_piece())
+                              font=('Arial',14), command=lambda: supprimer_piece(),
+                              bg='#f2f2f2',fg='#222222', width=10)
 
 # Organisation de la grille de la zone de séléction des pièces
 
-label_pieces.grid(row=0,column=0)
-listebox_pieces.grid(row=1,column=0,padx=20,pady=20)
-label_ajouter_ou_supprimer.grid(row=2,column=0)
-saisie_nom_piece.grid(row=3,column=0,padx=2,pady=2)
+label_pieces.grid(row=0,column=0, pady=(40,20))
+listebox_pieces.grid(row=1,column=0, pady=(0,20),sticky="ew")
+label_ajouter_ou_supprimer.grid(row=2,column=0, pady=(30,0))
+saisie_nom_piece.grid(row=3,column=0,padx=2,pady=10)
 bouton_ajouter_piece.grid(row=4,column=0,padx=2,pady=2)
 bouton_supprimer_piece.grid(row=5,column=0,padx=2,pady=2)
 
