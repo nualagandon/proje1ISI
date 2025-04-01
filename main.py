@@ -226,8 +226,8 @@ cadre_chauffage = Frame(cadre_actions)
 
 cadre_pieces.grid(row=0,column=0,sticky="nsw")
 cadre_actions.grid(row=0,column=1,sticky="nsew")
-cadre_eclairage.grid(row=1, column=0)
-cadre_chauffage.grid(row=2, column=0)
+cadre_eclairage.grid(row=1, column=0, sticky="w")
+cadre_chauffage.grid(row=2, column=0, sticky="w")
 
 
 # Configuration de la zone de séléction des pièces
@@ -279,18 +279,18 @@ bouton_supprimer_piece.grid(row=5,column=0,padx=2,pady=2)
 # Configuration de la zone d'actions
 label_actions = Label(cadre_actions, text="Actions", font=('Arial',20))
 # Séléction du statut de l'éclairage : Allumer ou Eteindre
-label_eclairage = Label(cadre_eclairage, text="Eclairage", font=('Arial',20), anchor='w')
+label_eclairage = Label(cadre_eclairage, text="Eclairage", font=('Arial',20), width=40, justify='left')
 
 options_eclairage = StringVar()
-combobox_statut_eclairage = ttk.Combobox(cadre_eclairage,textvariable=options_eclairage,font=('Arial',14))
+combobox_statut_eclairage = ttk.Combobox(cadre_eclairage,textvariable=options_eclairage,font=('Arial',14), width=40)
 combobox_statut_eclairage['values'] = ('Allumer','Eteindre')
 combobox_statut_eclairage.current(0)
 
 # Séléction de la couleur de l'éclairage
 label_couleur_eclairage = Label(cadre_eclairage, text="Couleur de l'éclairage",
-                                font=('Arial',16))
+                                font=('Arial',16), width=40, justify='left')
 options_couleur = StringVar()
-combobox_couleur_eclairage = ttk.Combobox(cadre_eclairage,textvariable=options_couleur,font=('Arial',14))
+combobox_couleur_eclairage = ttk.Combobox(cadre_eclairage,textvariable=options_couleur,font=('Arial',14), width=40)
 combobox_couleur_eclairage['values'] = ('Blanc',
                               'Jaune',
                               'Rouge',
@@ -302,9 +302,9 @@ combobox_couleur_eclairage.current(0)
 
 # Séléction de l'intensité de l'éclairage
 label_spinbox_intensite_eclairage = Label(cadre_eclairage, text="Intensité lumineuse",
-                                font=('Arial',16))
+                                font=('Arial',16),width=40, justify='left')
 valeur_spinbox_intensite_eclairage = StringVar()
-spinbox_intensite_eclairage = Spinbox(cadre_eclairage, from_=1, to=100, textvariable=valeur_spinbox_intensite_eclairage, font=('Arial',14))
+spinbox_intensite_eclairage = Spinbox(cadre_eclairage, from_=1, to=100, width=40,textvariable=valeur_spinbox_intensite_eclairage, font=('Arial',14))
 
 combobox_statut_eclairage.bind("<<ComboboxSelected>>", changer_etat_eclairage)
 
